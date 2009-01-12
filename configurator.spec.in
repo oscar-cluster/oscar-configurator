@@ -33,10 +33,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%{binpref}/*
 %{libpref}/*
-%{sharepref}/*
-%{manpref}/*
 
 %changelog
 * Thu Jan 08 2009 Geoffroy Vallee <valleegr@ornl.gov> 1.0-1
