@@ -1,3 +1,9 @@
+configurator (1.0.1-1) intrepid; urgency=low
+
+  * New upstream version.
+
+ -- Geoffroy Vallee <valleegr@ornl.gov>  Tue, 10 Feb 2009 11:55:46 -0500
+
 configurator (1.0-1) stable; urgency=low
 
   * New upstream version.
