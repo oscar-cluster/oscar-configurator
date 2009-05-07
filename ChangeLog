@@ -1,3 +1,6 @@
+1.0.2 (not yet released):
+- Fix the interface with Selector.
+
 1.0.1:
 - Modify the Makefile so we can choose the directory to save sources when
 creating RPMs.

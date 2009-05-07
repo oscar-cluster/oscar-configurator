@@ -90,6 +90,24 @@ sub readInConfigValues { # ($filename) -> $values
     return \%values;
 }
 
+sub get_configurable_opkgs () {
+    # Get the list of configurable packages
+    my @packages = OSCAR::Database::get_selected_opkgs();
+    my %opkgs = ();
+
+    # Skip any package which don't have a configurator.html file
+    foreach my $opkg (@packages) {
+        my $found = 0;
+        foreach my $dir (@OSCAR::PackagePath::PKG_SOURCE_LOCATIONS) {
+            if (-s "$dir/$opkg/configurator.html") {
+                $opkgs{$opkg} = "$dir/$opkg";
+            }
+        }
+    }
+
+    return %opkgs;
+}
+
 1;
 
 __END__
@@ -106,6 +124,10 @@ are like a library, independent from the GUI.
 =item readInConfigValues
 
 Read the values from a Configurator configuration file.
+
+=item get_configurable_opkgs
+
+Read the list of OSCAR packages that are configurable.
 
 =back
 

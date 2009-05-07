@@ -8,7 +8,7 @@
 
 Summary:        OSCAR Configurator.
 Name:           configurator
-Version:        1.0.1
+Version:        1.0.2
 Release:        1
 Vendor:         Open Cluster Group <http://OSCAR.OpenClusterGroup.org/>
 Distribution:   OSCAR
@@ -19,6 +19,7 @@ Source:         %{name}.tar.gz
 BuildRoot:      %{_localstatedir}/tmp/%{name}-root
 BuildArch:      noarch
 AutoReqProv: 	no
+Requires:       oda >= 1.4.5
 
 %description
 Set of scripts and Perl modules for the OSCAR Configurator.
@@ -36,6 +37,8 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %{libpref}/*
 
 %changelog
+* Thu May 07 2009 Geoffroy Vallee <valleegr@ornl.gov> 1.0.2-1
+- New upstream version (see ChangeLog for more details).
 * Tue Feb 10 2009 Geoffroy Vallee <valleegr@ornl.gov> 1.0.1-1
 - New upstream version (see ChangeLog for more details).
 * Thu Jan 08 2009 Geoffroy Vallee <valleegr@ornl.gov> 1.0-1

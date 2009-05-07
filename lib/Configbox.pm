@@ -604,16 +604,28 @@ sub displayWebPage { # ($parent,$file)
 #              2. The full path for an OSCAR package's directory.       #
 #              3. The opkg name.                                        #
 #              4. The "context" for these variables                     #
-#  Returns   : Nothing                                                  #
+#  Returns   : -1 if error, 0 else.                                     #
 #  This subroutine takes the full path name of a subdirectory under the #
 #  OSCAR "packages" directory and attempts to render the configuration  #
 #  HTML file to allow for package configuration.                        #
 #########################################################################
-sub configurePackage {
+sub configurePackage ($$$$) {
     my $parent = shift;
     $packagedir = shift;
     my $opkg = shift;
     my $context = shift;
+
+    # We first check the parameters
+    require OSCAR::Utils;
+    if (!OSCAR::Utils::is_a_valid_string ($packagedir)) {
+        carp "ERROR: the package directory is undefined";
+        return -1;
+    }
+    if (! -d $packagedir) {
+        carp "ERROR: Directory $packagedir does not exist";
+        return -1;
+    }
+
     $context = "" if ! $context;
 
     $my_opkg = $opkg;
@@ -624,7 +636,7 @@ sub configurePackage {
 	       (!(-s "$packagedir/configurator.html")));
 
     my $tree = readInDefaultConfig("$packagedir/configurator.html");
-    return if (!$tree);
+    return 0 if (!$tree);
 
     my $values =  OSCAR::Configurator_backend::readInConfigValues("$packagedir/configurator.html",
 				     $opkg, $context);
@@ -633,6 +645,8 @@ sub configurePackage {
     $tree->delete;    # Always delete the tree when you are done with it.
 
     displayWebPage($parent,"$packagedir/.configurator.temp.html");
+
+    return 0;
 }
 
 #

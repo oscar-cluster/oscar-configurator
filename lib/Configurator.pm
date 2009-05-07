@@ -99,106 +99,42 @@ our($pane);                   # The pane holding the scrolling selection list
 #########################################################################
 #  Called when the "Done" button is pressed.                            #
 #########################################################################
-sub doneButtonPressed
-{
-  # If the $root window has a Parent, then it isn't a MainWindow, which
-  # means that another MainWindow is managing the OSCAR Package
-  # Configuration window.  Therefore, when we exit, we need to make the
-  # parent window unbusy.
-  undef $destroyed;
-  $root->UnmapWindow if ($root);
-  $root->Parent->Unbusy() if
-    ((defined($root)) && (defined($root->Parent)));
+sub doneButtonPressed {
+    # If the $root window has a Parent, then it isn't a MainWindow, which
+    # means that another MainWindow is managing the OSCAR Package
+    # Configuration window.  Therefore, when we exit, we need to make the
+    # parent window unbusy.
+    undef $destroyed;
+    $root->UnmapWindow if ($root);
+    $root->Parent->Unbusy() 
+        if ((defined($root)) && (defined($root->Parent)));
 
-  # Destroy the Configbox if one was created.
-  OSCAR::Configbox::exitWithoutSaving;
+    # Destroy the Configbox if one was created.
+    OSCAR::Configbox::exitWithoutSaving;
 
-  # If there are any children, make sure they are destroyed.
-  my (@kids) = $root->children;
-  foreach my $kid (@kids)
-    {
-      $kid->destroy;
+    # If there are any children, make sure they are destroyed.
+    my (@kids) = $root->children;
+    foreach my $kid (@kids) {
+        $kid->destroy;
     }
 
-  # Then, destroy the root window.
-  $root->destroy if (defined($root));
+    # Then, destroy the root window.
+    $root->destroy if (defined($root));
 
-  # Undefine a bunch of Tk widgeet variables for re-creation later.
-  undef $root;
-  undef $top;
-  undef $pane;
+    # Undefine a bunch of Tk widgeet variables for re-creation later.
+    undef $root;
+    undef $top;
+    undef $pane;
 
-  # Call the post-configure API script in each selected package
-  my $packages_ref = getSelectedConfigurablePackages();
-  foreach my $pkg (sort keys %$packages_ref) 
-    {
-      carp("Post-configure script for package \"$pkg\" failed") if 
-        (!run_pkg_script($pkg, "post_configure", 1, ""));
+    # Call the post-configure API script in each selected package
+    my @opkgs = OSCAR::Database::get_selected_opkgs ();
+    foreach my $opkg (sort @opkgs) {
+        carp("Post-configure script for OPKG \"$opkg\" failed") 
+            if (!OSCAR::Package::run_pkg_script($opkg, "post_configure", 1, ""));
     }
 
-  # Write out a message to the OSCAR log
-  oscar_log_subsection("Step $stepnum: Completed successfully");
-}
-
-#########################################################################
-#  Subroutine name : getSelectedConfigurablePackages                    #
-#  Parameters: None                                                     #
-#  Returns   : a reference to a hash with the keys being the short      #
-#              package name and the values being the long package name  #
-#  This subroutine reads in the list of package names from the database #
-#  that have been selected for installation (via the Selector OR via    #
-#  the Updater) and returns them in a hash ref.  Note that if you       #
-#  just want the packages that have configurator.html files, you will   #
-#  need to post-process the hash.                                       #
-#########################################################################
-sub getSelectedConfigurablePackages
-{
-  # Read all records from the database table <packages> that are marked
-  # as being installable and as being selected, saving the long package
-  # name in the <package> field for each package (we could do this with
-  # a shortcut but this code is about to be replaced and want a special
-  # output format).
-  my @results;
-  my %packages;
-
-  # START LOCKING FOR NEST
-  #my @tables = ("Cluster", "Packages", "Group_Packages", "Node_Package_Status", "Groups");
-  my @error_list = ();
-  my %options = ();
-  #locking("WRITE", \%options, \@tables, \@error_list);
-  #OSCAR::Database::dec_already_locked(
-  #  "packages_in_selected_package_set packages.package", \@results,1);
-  my $success = OSCAR::Database::get_selected_group_packages(\@results,
-                                                             \%options,
-                                                             \@error_list,
-                                                             undef,
-                                                             undef);
-
-  # Transform the list into a hash; keys=short pkg name, values=long pkg name
-  foreach my $pkg_ref (@results) {
-      my $pname = $$pkg_ref{package};
-      my $ppackage = $$pkg_ref{package};
-      print "$pname, $ppackage\n" if $options{debug};
-      $packages{$pname} = $ppackage;
-  }
-
-  # Actually we don't need this any more in the new DB schema.
-  #
-  # Add in any packages which "should_be_installed"
-  #my @pkginstall = ();
-  #OSCAR::Database::dec_already_locked(
-  #  "packages_that_should_be_installed", \@pkginstall);
-  #foreach my $package (@pkginstall)
-  #  { # Get the long name and add the short name/long name to the hash
-  #    my @longname = ();
-  #    OSCAR::Database::dec_already_locked(
-  #      "read_records packages name=$package package",\@longname);
-  #    $packages{$package} = ((defined $longname[0]) ? $longname[0] : $package);
-  #  }
-  # UNLOCKING FOR NEST
-  #unlock(\%options, \@error_list);
-
-  return \%packages;
+    # Write out a message to the OSCAR log
+    oscar_log_subsection("Step $stepnum: Completed successfully");
 }
 
 #########################################################################
@@ -213,109 +149,85 @@ sub getSelectedConfigurablePackages
 #  it with the list of package directories found under the main OSCAR   #
 #  directory.                                                           #
 #########################################################################
-sub populateConfiguratorList
-{
-  my($tempframe);
-  my($packagedir);
+sub populateConfiguratorList {
+    my($tempframe);
+    my($packagedir);
 
-  # Set up the base directory where this script is being run
-  if ($ENV{OSCAR_HOME}) {
-    $oscarbasedir = $ENV{OSCAR_HOME};
-  } else {
-    $oscarbasedir = "/var/lib/oscar";
-  }
-
-  # Get the list of selected, configurable packages
-  my $packages_ref = getSelectedConfigurablePackages();
-
-  # Skip any packages which don't have a configurator.html file
-  foreach my $package ( sort keys %$packages_ref ) 
-    {
-      my $found = 0;
-      foreach my $dir (@OSCAR::PackagePath::PKG_SOURCE_LOCATIONS) 
-        {
-          if (-s "$dir/$package/configurator.html") {
-            $found = 1;
-            last;
-          }
-        }
-      delete $packages_ref->{$package} if (!$found);
+    # Set up the base directory where this script is being run
+    if ($ENV{OSCAR_HOME}) {
+        $oscarbasedir = $ENV{OSCAR_HOME};
+    } else {
+        $oscarbasedir = "/var/lib/oscar";
     }
 
-  $pane->destroy if ($pane);
-  # First, put a "Pane" widget in the center frame
-  $pane = $configFrame->Scrolled('Pane', -scrollbars => 'oe');
-  $pane->pack(-expand => 1, -fill => 'both');
+    # Get the list of configurable packages
+    my %packages = OSCAR::Configurator_backend::get_configurable_opkgs();
 
-  # Now, start adding OSCAR package stuff to the pane
-  if ( ! %$packages_ref )
-    {
-      $pane->Label(-text => "No OSCAR packages to configure.")->pack;
-    }
-  else
-    { # Create a temp Frame widget for each package row
-      my $h;
-      foreach my $package (sort keys %$packages_ref )
-        {
-          # Create a frame and save it in a hash based on pkgdir name
-          $tempframe->{$package} = $pane->Frame();
+    $pane->destroy if ($pane);
+    # First, put a "Pane" widget in the center frame
+    $pane = $configFrame->Scrolled('Pane', -scrollbars => 'oe');
+    $pane->pack(-expand => 1, -fill => 'both');
 
-          # Figure out where the package directory is located on the disk.
-          $packagedir =  "$oscarbasedir/packages/$package";  # Fallback
-          foreach my $dir (@OSCAR::PackagePath::PKG_SOURCE_LOCATIONS)
-            {
-              (($packagedir = "$dir/$package") and last) if
-                (-d "$dir/$package");
+    # Now, start adding OSCAR package stuff to the pane
+    if ( keys (%packages) == 0 ) {
+        $pane->Label(-text => "No OSCAR packages to configure.")->pack;
+    } else {
+        # Create a temp Frame widget for each package row
+        my $h;
+        foreach my $package (keys %packages) {
+            # Create a frame and save it in a hash based on pkgdir name
+            $tempframe->{$package} = $pane->Frame();
+
+            # Figure out where the package directory is located on the disk.
+            $packagedir =  $packages{$package};  
+            print "TOTO: $packagedir\n";
+
+            # Then add the config buttons and package name labels.
+            # First, the configure prompt...
+            $tempframe->{$package}->Label(
+                -text => 'Configure:',
+                -padx => 4,
+                )->pack(-side => 'left');
+
+            # Then, the actual button with the package name as label...
+            my $f = $tempframe->{$package}->Button(
+		        -text => $package,
+                -command => [ \&OSCAR::Configbox::configurePackage,
+                            $root,
+                            $packagedir,
+			                $package,
+                            ],
+                -padx => 4,
+                );
+            $f->pack(-side => 'left', -expand => 1, -fill => 'x' );
+
+            # Capture the height of one line...
+            unless( $h ) {
+                my $fn = $f->fontActual( 'default' );
+                $h = $f->fontMetrics( $fn, -linespace );
             }
-
-          # Then add the config buttons and package name labels.
-          # First, the configure prompt...
-          $tempframe->{$package}->Label(
-            -text => 'Configure:',
-            -padx => 4,
-            )->pack(-side => 'left');
-
-          # Then, the actual button with the package name as label...
-          my $f = $tempframe->{$package}->Button(
-		    -text => $$packages_ref{$package},
-            -command => [ \&OSCAR::Configbox::configurePackage,
-                          $root,
-                          $packagedir,
-			  $package,
-                        ],
-            -padx => 4,
-            );
-          $f->pack(-side => 'left', -expand => 1, -fill => 'x' );
-
-          # Capture the height of one line...
-          unless( $h ) {
-            my $fn = $f->fontActual( 'default' );
-            $h = $f->fontMetrics( $fn, -linespace );
-          }
         }
 
-      # Now that we have created all of the temporary frames (each
-      # containing a config button and text label), add them to the
-      # scrolled pane in order of their "fancy" names rather than their
-      # package directory names.  To do this, create a reverse mapping from
-      # fancy names to directory names, sort on the fancy names, and use
-      # that as a hash key into the tempframe hash.
-      my(%map);
-      foreach my $package (keys %$packages_ref )
-        {
-          $map{$$packages_ref{$package}} = $package;
+        # Now that we have created all of the temporary frames (each
+        # containing a config button and text label), add them to the
+        # scrolled pane in order of their "fancy" names rather than their
+        # package directory names.  To do this, create a reverse mapping from
+        # fancy names to directory names, sort on the fancy names, and use
+        # that as a hash key into the tempframe hash.
+        my(%map);
+        foreach my $package (keys %packages) {
+            $map{$package} = $package;
         }
-      foreach my $pkgname (sort { lc($a) cmp lc($b) } keys %map)
-        {
-          $tempframe->{$map{$pkgname}}->pack(-side => 'top',
-                                             -fill => 'x',
-                                            );
+        foreach my $pkgname (sort { lc($a) cmp lc($b) } keys %map) {
+            $tempframe->{$map{$pkgname}}->pack (-side => 'top',
+                                                -fill => 'x',
+                                               );
         }
 
-      # Make the pane large enough for up 10 packages.
-      # vertical scrollbar will appear if more packages are configurable.
-      my $nr = scalar keys %map;
-      $pane->configure( -height => 5*$h*($nr > 10 ? 10 : $nr) );
+        # Make the pane large enough for up 10 packages.
+        # vertical scrollbar will appear if more packages are configurable.
+        my $nr = scalar keys %map;
+        $pane->configure( -height => 5*$h*($nr > 10 ? 10 : $nr) );
     }
 }
 
@@ -327,41 +239,37 @@ sub populateConfiguratorList
 #########################################################################
 sub displayPackageConfigurator # ($parent)
 {
-  my $parent = shift;
-  $stepnum = shift;
+    my $parent = shift;
+    $stepnum = shift;
 
-  oscar_log_section("Running step $stepnum of the OSCAR wizard: Configure selected OSCAR packages");
+    oscar_log_section("Running step $stepnum of the OSCAR wizard: Configure ".
+                      "selected OSCAR packages");
 
-  # Call the pre-configure API script in each selected package and,
-  # for the install/uninstall stuff, any packages which "should_be_installed"
-  my $packages_ref = getSelectedConfigurablePackages();
-  foreach my $pkg (sort keys %$packages_ref) 
-    {
-     carp('Pre-configure script for package "' . $pkg . '" failed') if 
-        (!run_pkg_script($pkg, "pre_configure", 1, ""));
+    # Call the pre-configure API script in each selected package and,
+    # for the install/uninstall stuff, any packages which "should_be_installed"
+    my @packages = OSCAR::Database::get_selected_opkgs();
+    foreach my $pkg (sort @packages) {
+        carp('Pre-configure script for package "' . $pkg . '" failed') 
+            if (!OSCAR::Package::run_pkg_script($pkg, "pre_configure", 1, ""));
     }
 
-  # Check to see if our toplevel configurator window has been created yet.
-  if (!$top)
-    { # Create the toplevel window just once
-      if ($parent)
-        {
-          # Make the parent window busy
-          $parent->Busy(-recurse => 1);
-          $top = $parent->Toplevel(-title => 'Oscar Package Configuration');
-          $top->bind('<Destroy>', sub {
+    # Check to see if our toplevel configurator window has been created yet.
+    if (!$top) { # Create the toplevel window just once
+        if ($parent) {
+            # Make the parent window busy
+            $parent->Busy(-recurse => 1);
+            $top = $parent->Toplevel(-title => 'Oscar Package Configuration');
+            $top->bind('<Destroy>', sub {
                                         if ( defined($destroyed)) {
-                                          undef $destroyed;
-                                          doneButtonPressed();
-                                          return;
+                                            undef $destroyed;
+                                            doneButtonPressed();
+                                            return;
                                         }
-                                      } );
-        }
-      else
-        { # If no parent, then create a MainWindow at the top.
-          $top = MainWindow->new();
-          $top->title("Oscar Package Configuration");
-          $top->bind('<Destroy>', sub {
+                                        } );
+        } else { # If no parent, then create a MainWindow at the top.
+            $top = MainWindow->new();
+            $top->title("Oscar Package Configuration");
+            $top->bind('<Destroy>', sub {
                                         if (defined($destroyed)) {
                                           undef $destroyed;
                                           doneButtonPressed();
@@ -369,16 +277,16 @@ sub displayPackageConfigurator # ($parent)
                                         }
                                       } );
         }
-      $top->withdraw;
-      OSCAR::Configurator::Configurator_ui $top;  # Call specPerl window creator
+        $top->withdraw;
+        OSCAR::Configurator::Configurator_ui $top;  # Call specPerl window creator
     }
 
-  # Then create the scrollable package listing and place it in the grid.
-  populateConfiguratorList();
+    # Then create the scrollable package listing and place it in the grid.
+    populateConfiguratorList();
 
-  OSCAR::Tk::center_window( $root );
+    OSCAR::Tk::center_window( $root );
 
-  return $root;       # Return pointer to new window to calling function
+    return $root;       # Return pointer to new window to calling function
 }
 
 ############################################
