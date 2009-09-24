@@ -1,4 +1,5 @@
 1.0.3 (not yet released):
+- Fic the Debian copyright.
 - Modification of the spec file so we can create the RPM on FC11 (patch from
 Christophe Trophime).
 
