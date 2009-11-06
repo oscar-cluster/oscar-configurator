@@ -1,3 +1,6 @@
+1.0.4 (not yet released):
+- Remove unecessary debugging messages.
+
 1.0.3:
 - Fic the Debian copyright.
 - Modification of the spec file so we can create the RPM on FC11 (patch from

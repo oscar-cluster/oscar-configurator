@@ -180,7 +180,6 @@ sub populateConfiguratorList {
 
             # Figure out where the package directory is located on the disk.
             $packagedir =  $packages{$package};  
-            print "TOTO: $packagedir\n";
 
             # Then add the config buttons and package name labels.
             # First, the configure prompt...
