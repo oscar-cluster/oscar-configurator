@@ -49,7 +49,8 @@ use OSCAR::Logger;
 #              3. context (see Packages_config table in ODA)            #
 #              4. selection arguments e.g. noarray => 1                 #
 #  Returns   : A HASH reference with all related variable names (as     #
-#              keys) and their values (as anonymous array references)   #
+#              keys) and their values (as anonymous array references).  #
+#              Undef if error.                                          #
 #########################################################################
 sub readInConfigValues { # ($filename) -> $values
 
@@ -65,7 +66,7 @@ sub readInConfigValues { # ($filename) -> $values
     OSCAR::Database_generic::do_select($sql,\@result, \%options, \@errors);
     if (!@result) {
         oscar_log_subsection ("OPKG $opkg excluded from that type of system");
-        return 0;
+        return undef;
     } else {
         oscar_log_subsection ("OPKG $opkg: Analysing default values");
     }

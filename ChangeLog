@@ -1,5 +1,6 @@
 1.0.4 (not yet released):
 - Remove unecessary debugging messages.
+- Fix a bad return code in OSCAR::Configurator_backend::readInConfigValues.
 
 1.0.3:
 - Fic the Debian copyright.
