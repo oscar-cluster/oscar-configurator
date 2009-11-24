@@ -1,4 +1,4 @@
-1.0.4 (not yet released):
+1.0.4:
 - Remove unecessary debugging messages.
 - Fix a bad return code in OSCAR::Configurator_backend::readInConfigValues.
 
