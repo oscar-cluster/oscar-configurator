@@ -1,4 +1,4 @@
-1.0.5 (not yet released):
+1.0.5:
 - Install the API side of OPKGs at the beginning of the OPKG configuration
 phase (reported by Olivier Lahaye).
 
