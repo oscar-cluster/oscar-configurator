@@ -244,6 +244,24 @@ sub displayPackageConfigurator # ($parent)
     oscar_log_section("Running step $stepnum of the OSCAR wizard: Configure ".
                       "selected OSCAR packages");
 
+    # Make sure that all selected packages have the API side of the OPKGs
+    # installed (non-core OPKGs).
+    my @selected_opkgs = OSCAR::Database::list_selected_packages();
+    my @core_opkgs = OSCAR::Opkg::get_list_core_opkgs();
+    my @opkgs;
+    foreach my $opkg (@selected_opkgs) {
+        if (!OSCAR::Utils::is_element_in_array ($opkg, @core_opkgs)) {
+            push (@opkgs, $opkg);
+        }
+    }
+    if (scalar (@opkgs) > 0) {
+        if (OSCAR::Opkg::opkgs_install("api", @opkgs)) {
+            carp ("ERROR: Impossible to install " . join (", ", @opkgs));
+            return undef;
+        }
+    }
+
+
     # Call the pre-configure API script in each selected package and,
     # for the install/uninstall stuff, any packages which "should_be_installed"
     my @packages = OSCAR::Database::get_selected_opkgs();

@@ -1,3 +1,7 @@
+1.0.5 (not yet released):
+- Install the API side of OPKGs at the beginning of the OPKG configuration
+phase (reported by Olivier Lahaye).
+
 1.0.4:
 - Remove unecessary debugging messages.
 - Fix a bad return code in OSCAR::Configurator_backend::readInConfigValues.
