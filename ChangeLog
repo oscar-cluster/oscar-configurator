@@ -1,3 +1,7 @@
+1.0.6 (not yet released):
+- Automatically detect the source directory on RPM based systems (patch from
+O. Lahaye).
+
 1.0.5:
 - Install the API side of OPKGs at the beginning of the OPKG configuration
 phase (reported by Olivier Lahaye).
