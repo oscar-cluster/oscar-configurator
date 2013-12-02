@@ -157,7 +157,7 @@ sub populateConfiguratorList {
     if ($ENV{OSCAR_HOME}) {
         $oscarbasedir = $ENV{OSCAR_HOME};
     } else {
-        $oscarbasedir = "/var/lib/oscar";
+        $oscarbasedir = "/usr/lib/oscar";
     }
 
     # Get the list of configurable packages

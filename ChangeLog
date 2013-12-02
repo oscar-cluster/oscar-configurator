@@ -1,6 +1,7 @@
-1.0.6 (not yet released):
+1.0.6:
 - Automatically detect the source directory on RPM based systems (patch from
 O. Lahaye).
+- Migration from /var/lib/oscar/{package,testing} to /usr/lib/oscar (FHS)
 
 1.0.5:
 - Install the API side of OPKGs at the beginning of the OPKG configuration

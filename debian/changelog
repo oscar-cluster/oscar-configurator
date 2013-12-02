@@ -1,3 +1,9 @@
+configurator (1.0.6-1) hardy; urgency=low
+
+  * New upstream version. 
+
+ -- Olivier Lahaye <olivier.lahaye@cea.fr>  Mon,  2 Dec 2013 16:06:57 +0100
+
 configurator (1.0.5-1) hardy; urgency=low
 
   * New upstream version. 
