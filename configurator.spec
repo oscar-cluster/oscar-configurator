@@ -26,11 +26,12 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%{perl_vendorlib}/OSCAR
+%{perl_vendorlib}/OSCAR/*
 
 %changelog
 * Sun Dec 15 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.6-2
 - Fixed packaging: no more need to use the SEDLIBDIR.
+- Avoid owning %{perl_vendorlib}/OSCAR (owned by oscar-base-lib)
 * Mon Dec 02 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.6-1
 - New upstream version (see ChangeLog for more details).
 * Tue Nov 24 2009 Geoffroy Vallee <valleegr@ornl.gov> 1.0.5-1
