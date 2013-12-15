@@ -34,8 +34,6 @@ dist: clean
 	@rm -f /tmp/$(PKG).tar.gz
 
 rpm: dist
-	sed -e "s/PERLLIBPATH/$(SEDLIBDIR)/" < $(PKG).spec.in \
-        > $(PKG).spec
 	cp $(PKG).tar.gz `rpm --eval '%_sourcedir'`
 	rpmbuild -bb ./$(PKG).spec
 	@if [ -n "$(PKGDEST)" ]; then \

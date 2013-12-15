@@ -1,15 +1,8 @@
-%define binpref /usr/bin
-%define libpref PERLLIBPATH
-%define manpref /usr/local/man/man1
-%define sharepref /usr/share/oscar/prereqs/configurator/
-%define bintarget $RPM_BUILD_ROOT%{binpref}
-%define libtarget $RPM_BUILD_ROOT%{libpref}
-%define mantarget $RPM_BUILD_ROOT%{manpref}
 
 Summary:        OSCAR Configurator.
 Name:           configurator
 Version:        1.0.6
-Release:        1
+Release:        2
 Vendor:         Open Cluster Group <http://OSCAR.OpenClusterGroup.org/>
 Distribution:   OSCAR
 Packager:       Geoffroy Vallee <valleegr@ornl.gov>
@@ -18,7 +11,6 @@ Group:          Development/Libraries
 Source:         %{name}.tar.gz
 BuildRoot:      %{_localstatedir}/tmp/%{name}-root
 BuildArch:      noarch
-AutoReqProv: 	no
 Requires:       oda >= 1.4.5
 
 %description
@@ -34,9 +26,11 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%{libpref}/*
+%{perl_vendorlib}/OSCAR
 
 %changelog
+* Sun Dec 15 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.6-2
+- Fixed packaging: no more need to use the SEDLIBDIR.
 * Mon Dec 02 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.6-1
 - New upstream version (see ChangeLog for more details).
 * Tue Nov 24 2009 Geoffroy Vallee <valleegr@ornl.gov> 1.0.5-1
