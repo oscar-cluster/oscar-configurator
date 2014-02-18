@@ -42,6 +42,8 @@ use File::Basename;
 use OSCAR::Database;
 use OSCAR::Database_generic;
 use OSCAR::Configurator_backend;
+use OSCAR::Logger;
+use OSCAR::LoggerDefs;
 
 my($conf_parent);         # The parent window for the config boxes.
 my($top);            # The Toplevel widget for the config box.
@@ -448,7 +450,7 @@ sub writeOutTempConfig { # ($tree)
 	print TREE $tree->as_HTML('<>&',"  ");
 	close TREE;
     } else {
-	carp("Couldn't write temporary HTML configuration file!");
+	oscar_log(5, ERROR, "Couldn't write temporary HTML configuration file!");
 	exitWithoutSaving();
     }
 }
@@ -618,11 +620,11 @@ sub configurePackage ($$$$) {
     # We first check the parameters
     require OSCAR::Utils;
     if (!OSCAR::Utils::is_a_valid_string ($packagedir)) {
-        carp "ERROR: the package directory is undefined";
+        oscar_log(5, ERROR, "The package directory is undefined");
         return -1;
     }
     if (! -d $packagedir) {
-        carp "ERROR: Directory $packagedir does not exist";
+        oscar_log(5, ERROR, "Directory $packagedir does not exist");
         return -1;
     }
 

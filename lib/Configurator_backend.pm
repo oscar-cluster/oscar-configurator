@@ -41,6 +41,7 @@ use OSCAR::Database;
 use OSCAR::Database_generic;
 use OSCAR::Configbox;
 use OSCAR::Logger;
+use OSCAR::LoggerDefs;
 
 #########################################################################
 #  Subroutine: readInConfigValues                                       #
@@ -62,13 +63,13 @@ sub readInConfigValues { # ($filename) -> $values
     my (%options, @errors);
     my @result = ();
     my $sql = "SELECT Packages.package FROM Packages WHERE Packages.package='$opkg'";
-    oscar_log_subsection ("Checking if the OPKG has to be excluded...");
+    oscar_log(6, INFO, "Checking if the OPKG has to be excluded...");
     OSCAR::Database_generic::do_select($sql,\@result, \%options, \@errors);
     if (!@result) {
-        oscar_log_subsection ("OPKG $opkg excluded from that type of system");
+        oscar_log(5, WARNING, "OPKG $opkg excluded from that type of system");
         return undef;
     } else {
-        oscar_log_subsection ("OPKG $opkg: Analysing default values");
+        oscar_log(5, INFO, "OPKG $opkg: Analysing default values");
     }
 
     my @res = OSCAR::Database::get_pkgconfig_vars(opkg => "$opkg",

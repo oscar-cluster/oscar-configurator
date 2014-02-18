@@ -1,3 +1,6 @@
+1.0.7:
+- Migrated to new OSCAR::Logger
+
 1.0.6:
 - Automatically detect the source directory on RPM based systems (patch from
 O. Lahaye).

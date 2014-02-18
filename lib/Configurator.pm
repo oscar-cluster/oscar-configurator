@@ -44,7 +44,8 @@ use OSCAR::Configbox; # For the configuration HTML form display
 use OSCAR::Package;   # For run_pkg_script()
 use OSCAR::PackagePath; # For PKG_SOURCE_LOCATIONS
 use OSCAR::Database;  # For list_installable_packages(), locking() and unlock()
-use OSCAR::Logger;    # For oscar_log_section()
+use OSCAR::Logger;    # For oscar_log()
+use OSCAR::LoggerDefs; # For INFOS, ERROR, WARNING in oscar_log calls.
 use OSCAR::Tk;
 #use OSCAR::Selector;
 #use XML::Simple;      # Read/write the .selection config files
@@ -129,12 +130,12 @@ sub doneButtonPressed {
     # Call the post-configure API script in each selected package
     my @opkgs = OSCAR::Database::get_selected_opkgs ();
     foreach my $opkg (sort @opkgs) {
-        carp("Post-configure script for OPKG \"$opkg\" failed") 
+        oscar_log(5, ERROR, "Post-configure script for OPKG \"$opkg\" failed")
             if (!OSCAR::Package::run_pkg_script($opkg, "post_configure", 1, ""));
     }
 
     # Write out a message to the OSCAR log
-    oscar_log_subsection("Step $stepnum: Completed successfully");
+    oscar_log(1, SUBSECTION, "Step $stepnum: Completed successfully");
 }
 
 #########################################################################
@@ -241,7 +242,7 @@ sub displayPackageConfigurator # ($parent)
     my $parent = shift;
     $stepnum = shift;
 
-    oscar_log_section("Running step $stepnum of the OSCAR wizard: Configure ".
+    oscar_log(1, SECTION, "Running step $stepnum of the OSCAR wizard: Configure ".
                       "selected OSCAR packages");
 
     # Make sure that all selected packages have the API side of the OPKGs
@@ -256,7 +257,7 @@ sub displayPackageConfigurator # ($parent)
     }
     if (scalar (@opkgs) > 0) {
         if (OSCAR::Opkg::opkgs_install("api", @opkgs)) {
-            carp ("ERROR: Impossible to install " . join (", ", @opkgs));
+            oscar_log(5, ERROR, "Failed to install " . join (", ", @opkgs));
             return undef;
         }
     }
@@ -266,7 +267,7 @@ sub displayPackageConfigurator # ($parent)
     # for the install/uninstall stuff, any packages which "should_be_installed"
     my @packages = OSCAR::Database::get_selected_opkgs();
     foreach my $pkg (sort @packages) {
-        carp('Pre-configure script for package "' . $pkg . '" failed') 
+        oscar_log(5, ERROR,'Pre-configure script for package "' . $pkg . '" failed')
             if (!OSCAR::Package::run_pkg_script($pkg, "pre_configure", 1, ""));
     }
 

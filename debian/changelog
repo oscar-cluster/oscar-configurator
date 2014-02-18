@@ -1,3 +1,9 @@
+configurator (1.0.7-1) hardy; urgency=low
+
+  * Migration to new OSCAR::Logger.
+
+ -- Olivier Lahaye <olivier.lahaye@cea.fr>  Tue, 18 Feb 2014 10:27:49 +0100
+
 configurator (1.0.6-1) hardy; urgency=low
 
   * New upstream version. 

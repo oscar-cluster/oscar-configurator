@@ -1,8 +1,8 @@
 
 Summary:        OSCAR Configurator.
 Name:           configurator
-Version:        1.0.6
-Release:        2
+Version:        1.0.7
+Release:        1
 Vendor:         Open Cluster Group <http://OSCAR.OpenClusterGroup.org/>
 Distribution:   OSCAR
 Packager:       Geoffroy Vallee <valleegr@ornl.gov>
@@ -29,6 +29,8 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %{perl_vendorlib}/OSCAR/*
 
 %changelog
+* Tue Feb 18 2014 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.7-1
+- New upstream version (see ChangeLog for more details).
 * Sun Dec 15 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.6-2
 - Fixed packaging: no more need to use the SEDLIBDIR.
 - Avoid owning %{perl_vendorlib}/OSCAR (owned by oscar-base-lib)
