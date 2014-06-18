@@ -1,7 +1,7 @@
 
 Summary:        OSCAR Configurator.
 Name:           configurator
-Version:        1.0.7
+Version:        1.0.8
 Release:        1
 Vendor:         Open Cluster Group <http://OSCAR.OpenClusterGroup.org/>
 Distribution:   OSCAR
@@ -29,6 +29,8 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %{perl_vendorlib}/OSCAR/*
 
 %changelog
+* Wed Jun 18 2014 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.8-1
+- New upstream version (see ChangeLog for more details).
 * Tue Feb 18 2014 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.7-1
 - New upstream version (see ChangeLog for more details).
 * Sun Dec 15 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.6-2

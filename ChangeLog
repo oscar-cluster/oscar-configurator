@@ -1,3 +1,6 @@
+1.0.8:
+- Minor adjustments in windows sizes.
+
 1.0.7:
 - Migrated to new OSCAR::Logger
 

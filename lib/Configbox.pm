@@ -586,7 +586,7 @@ sub displayWebPage { # ($parent,$file)
 					      ),
 					      };
 	$web->pack(-expand => '1', -fill => 'both');
-	$web->configure(-height => '15',
+	$web->configure(-height => '17',
 			-width => '60',
 			-cursor => 'left_ptr',
 			);

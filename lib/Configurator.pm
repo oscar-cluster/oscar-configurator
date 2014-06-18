@@ -82,8 +82,8 @@ sub Configurator_ui {
     -text => 'OSCAR Package Configuration',
   )->pack;
   our($configFrame) = $root->Frame (
-	-relief => 'groove',
-	-borderwidth => 2
+    -relief => 'groove',
+    -borderwidth => 2
   )->pack( -expand => 1, -fill => 'both' );
   $root->Button (
     -default => 'active',
@@ -191,11 +191,11 @@ sub populateConfiguratorList {
 
             # Then, the actual button with the package name as label...
             my $f = $tempframe->{$package}->Button(
-		        -text => $package,
+                -text => $package,
                 -command => [ \&OSCAR::Configbox::configurePackage,
                             $root,
                             $packagedir,
-			                $package,
+                            $package,
                             ],
                 -padx => 4,
                 );
@@ -227,7 +227,7 @@ sub populateConfiguratorList {
         # Make the pane large enough for up 10 packages.
         # vertical scrollbar will appear if more packages are configurable.
         my $nr = scalar keys %map;
-        $pane->configure( -height => 5*$h*($nr > 10 ? 10 : $nr) );
+        $pane->configure( -height => 2*$h*($nr > 10 ? 10 : $nr) );
     }
 }
 
