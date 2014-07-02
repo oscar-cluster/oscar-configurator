@@ -2,7 +2,7 @@
 Summary:        OSCAR Configurator.
 Name:           configurator
 Version:        1.0.8
-Release:        1
+Release:        1%{?dist}
 Vendor:         Open Cluster Group <http://OSCAR.OpenClusterGroup.org/>
 Distribution:   OSCAR
 Packager:       Geoffroy Vallee <valleegr@ornl.gov>
